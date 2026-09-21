@@ -1,0 +1,59 @@
+plugin:
+  name: Pacifica-LootSystem
+  version: 5.0.0
+linked-loot:
+  enabled: true
+  allowed-blocks:
+    - CHEST
+    - BARREL
+  protect-blocks: true
+  protect-from-explosions: true
+  max-linked-containers-per-loot-table: -1
+  unlink:
+    preserve-items: false
+loot-generation:
+  mode: PHYSICAL
+  require-empty-container: true
+  randomize-slots: true
+physical-loot:
+  enabled: true
+  size: 27
+  title: "&6&l%loot-name% Loot"
+  decorative-panels: false
+  random-slots: true
+  preserve-slot-position: true
+  allow-item-pickup: true
+  close-behavior: SAVE_REMAINING
+  disconnect-behavior: SAVE_REMAINING
+cooldown:
+  enabled: true
+  shared-by-loot-table: true
+hologram:
+  enabled: true
+  lines:
+    ready: "&6&l%loot-name% Crates|&a&lRestocked"
+    cooldown: "&6&l%loot-name% Crates|&7Restocking in &c%timer-cooldown%"
+economy:
+  enabled: true
+  provider: VAULT
+  expected-provider: EssentialsX
+  decimals: 2
+  deposit:
+    enabled: true
+    notify-player: true
+loot-bag:
+  enabled: true
+  cooldown-independent: true
+  inherit-linked-block-cooldown: false
+  instant-reward: true
+settings:
+  overflow-mode: DROP
+  maximum-recursion-depth: 8
+  debug: false
+fishing:
+  enabled: false
+  loot-table: fishing_rewards
+mobs: {}
+sounds:
+  loot-success: ENTITY_PLAYER_LEVELUP
+  loot-fail: ENTITY_VILLAGER_NO

@@ -1,0 +1,77 @@
+name: Pacifica-LootSystem
+version: 5.0.0
+main: com.districtx.pacificalootsystem.PacificaLootSystem
+api-version: '1.21'
+author: DistrictX Developers Official
+description: Advanced persistent loot tables, linked physical containers, loot bags, holograms, and economy rewards.
+website: https://github.com/hxmezu-a/Pacifica-LootSystem
+depend:
+  - Vault
+softdepend:
+  - Essentials
+commands:
+  loot:
+    description: Pacifica-LootSystem administration command.
+    usage: /loot <link|unlink|links|money|physical|reload>
+    aliases:
+      - loots
+      - lootmanager
+permissions:
+  pacifica.lootsystem.use:
+    description: Allows players to use linked loot containers.
+    default: true
+  pacifica.lootsystem.lootbag:
+    description: Allows players to use loot bags.
+    default: true
+  pacifica.lootsystem.admin:
+    description: Full Pacifica-LootSystem administration access.
+    default: op
+    children:
+      pacifica.lootsystem.admin.link: true
+      pacifica.lootsystem.admin.unlink: true
+      pacifica.lootsystem.admin.links: true
+      pacifica.lootsystem.admin.money: true
+      pacifica.lootsystem.admin.physical: true
+      pacifica.lootsystem.admin.reload: true
+      pacifica.lootsystem.admin.bypass: true
+  pacifica.lootsystem.admin.link:
+    description: Allows linking containers to loot tables.
+    default: op
+  pacifica.lootsystem.admin.unlink:
+    description: Allows unlinking loot containers.
+    default: op
+  pacifica.lootsystem.admin.links:
+    description: Allows viewing linked containers.
+    default: op
+  pacifica.lootsystem.admin.money:
+    description: Allows configuring loot table money rewards.
+    default: op
+  pacifica.lootsystem.admin.physical:
+    description: Allows configuring physical loot mode.
+    default: op
+  pacifica.lootsystem.admin.reload:
+    description: Allows reloading the plugin.
+    default: op
+  pacifica.lootsystem.admin.bypass:
+    description: Allows bypassing linked-container protection.
+    default: op
+  pacifica.lootsystem.admin.add:
+    default: op
+  pacifica.lootsystem.admin.addhand:
+    default: op
+  pacifica.lootsystem.admin.collectable:
+    default: op
+  pacifica.lootsystem.admin.collectable.add:
+    default: op
+  pacifica.lootsystem.admin.collectable.remove:
+    default: op
+  pacifica.lootsystem.admin.collectable.delete:
+    default: op
+  pacifica.lootsystem.admin.collectable.edit:
+    default: op
+  pacifica.lootsystem.admin.collectable.duplicate:
+    default: op
+  pacifica.lootsystem.bypass.cooldown:
+    default: op
+  pacifica.lootsystem.bypass.conditions:
+    default: op
