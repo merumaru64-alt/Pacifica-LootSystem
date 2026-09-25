@@ -35,14 +35,15 @@ public final class LootGenerator implements LootGenerationService {
         if (candidates.isEmpty()) { addMoneyRewards(result, table, collectable.getId()); result.setSuccessful(true); return result; }
         int minimum = Math.max(0, collectable.getMinimumRewards()); int maximum = Math.max(minimum, collectable.getMaximumRewards());
         int count = minimum + (maximum == minimum ? 0 : ThreadLocalRandom.current().nextInt(maximum - minimum + 1));
-        for (LootEntry entry : select(candidates, collectable.getSelectionMode(), count)) addReward(result, entry);
+        for (LootEntry entry : select(candidates, collectable.getSelectionMode(), count)) addReward(result, entry, table);
         addMoneyRewards(result, table, collectable.getId());
         result.setSuccessful(true); return result;
     }
     private void addMoneyRewards(LootResult result, LootTable table, java.util.UUID collectableId) {
         for (MoneyReward reward : table.getMoneyRewards().values()) {
             if (!reward.isEnabled() || (reward.getCollectableId() != null && !reward.getCollectableId().equals(collectableId))) continue;
-            result.setMoney(result.getMoney() + (plugin == null ? reward.generateAmount() : plugin.getEconomyService().generateAmount(reward.getMinimumAmount(), reward.getMaximumAmount())));
+            double amount = plugin == null ? reward.generateAmount() : plugin.getEconomyService().generateAmount(reward.getMinimumAmount(), reward.getMaximumAmount());
+            result.addMoneyReward(reward, amount);
         }
     }
     private boolean conditionsPass(List<String> conditions, LootContext context) { if (conditions == null) return true; for (String condition : conditions) if (!ConditionRegistry.test(condition, context)) return false; return true; }
@@ -68,7 +69,7 @@ public final class LootGenerator implements LootGenerationService {
         double total = entries.stream().mapToDouble(LootEntry::getWeight).filter(value -> value > 0).sum(); if (total <= 0) return entries.get(ThreadLocalRandom.current().nextInt(entries.size()));
         double value = ThreadLocalRandom.current().nextDouble(total); for (LootEntry entry : entries) { value -= Math.max(0, entry.getWeight()); if (value < 0) return entry; } return entries.get(entries.size() - 1);
     }
-    private void addReward(LootResult result, LootEntry entry) {
+    private void addReward(LootResult result, LootEntry entry, LootTable table) {
         int amount = randomInt(entry.getMinimumAmount(), entry.getMaximumAmount());
         switch (entry.getType().toUpperCase()) {
             case "ITEM" -> {
@@ -79,7 +80,11 @@ public final class LootGenerator implements LootGenerationService {
                 int remaining = amount; while (remaining > 0) { ItemStack stack = base.clone(); int stackAmount = Math.min(remaining, base.getMaxStackSize()); stack.setAmount(stackAmount); result.addItem(stack, entry.isAutoPickup()); remaining -= stackAmount; }
             }
             case "COMMAND" -> { if (entry.getCommand() != null) result.getCommands().add(entry.getCommand()); }
-            case "MONEY" -> result.setMoney(result.getMoney() + (plugin == null ? randomDouble(entry.getMinimumMoney(), entry.getMaximumMoney()) : plugin.getEconomyService().generateAmount(entry.getMinimumMoney(), entry.getMaximumMoney())));
+            case "MONEY" -> {
+                MoneyReward reward = new MoneyReward(entry.getId(), table.getUuid(), null, entry.getMinimumMoney(), entry.getMaximumMoney(), true);
+                double money = plugin == null ? randomDouble(entry.getMinimumMoney(), entry.getMaximumMoney()) : plugin.getEconomyService().generateAmount(entry.getMinimumMoney(), entry.getMaximumMoney());
+                result.addMoneyReward(reward, money);
+            }
             case "EXP" -> { int experience = randomInt(entry.getMinimumExperience(), entry.getMaximumExperience()); if (entry.isExperienceLevels()) result.setLevels(result.getLevels() + experience); else result.setExperience(result.getExperience() + experience); }
             default -> { }
         }

@@ -3,6 +3,7 @@ package com.districtx.pacificalootsystem.loot;
 import com.cryptomorin.xseries.XSound;
 import com.districtx.pacificalootsystem.PacificaLootSystem;
 import com.districtx.pacificalootsystem.api.LootContext;
+import com.districtx.pacificalootsystem.api.LootMoneyRewardPayout;
 import com.districtx.pacificalootsystem.api.LootResult;
 import com.districtx.pacificalootsystem.api.LootTable;
 import com.districtx.pacificalootsystem.api.LootRewardService;
@@ -16,7 +17,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
-import net.milkbowl.vault.economy.EconomyResponse;
 
 public final class LootService implements LootRewardService {
     private final PacificaLootSystem plugin;
@@ -59,21 +59,36 @@ public final class LootService implements LootRewardService {
             leftovers.values().forEach(leftover -> player.getWorld().dropItemNaturally(player.getLocation(), leftover));
         }
     }
-    public void deliverNonItemRewards(Player player, LootResult result, LootTable table) { if (result.getExperience() > 0) player.giveExp(result.getExperience()); if (result.getLevels() > 0) player.giveExpLevels(result.getLevels()); if (result.getMoney() > 0) { LootMoneyRewardEvent moneyEvent = new LootMoneyRewardEvent(player, table, result.getMoney()); plugin.getApi().getEventService().call(moneyEvent); if (!moneyEvent.isCancelled()) deposit(player, result.getMoney(), table); } for (String command : result.getCommands()) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), placeholders(command, player, table)); }
+    public void deliverNonItemRewards(Player player, LootResult result, LootTable table) {
+        if (result.getExperience() > 0) player.giveExp(result.getExperience());
+        if (result.getLevels() > 0) player.giveExpLevels(result.getLevels());
+        if (!result.getMoneyRewards().isEmpty()) {
+            for (LootMoneyRewardPayout payout : result.getMoneyRewards()) processMoneyReward(player, table, payout.getReward(), payout.getAmount());
+        } else if (result.getMoney() > 0) {
+            processMoneyReward(player, table, null, result.getMoney());
+        }
+        for (String command : result.getCommands()) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), placeholders(command, player, table));
+    }
+
+    private void processMoneyReward(Player player, LootTable table, com.districtx.pacificalootsystem.api.LootMoneyReward reward, double amount) {
+        if (!Double.isFinite(amount) || amount <= 0) return;
+        LootMoneyRewardEvent moneyEvent = new LootMoneyRewardEvent(player, table, reward, amount);
+        plugin.getApi().getEventService().call(moneyEvent);
+        if (!moneyEvent.isCancelled()) deposit(player, amount, table);
+    }
+
     private void deposit(Player player, double amount, LootTable table) {
         if (!plugin.getConfig().getBoolean("economy.enabled", true) || !plugin.getConfig().getBoolean("economy.deposit.enabled", true) || !plugin.getEconomyService().isAvailable()) {
             MessageUtil.send(plugin, player, "economy.unavailable");
             return;
         }
-        EconomyResponse response = plugin.getEconomyService().deposit(player, amount);
-        if (!response.transactionSuccess()) {
-            plugin.getLogger().warning("Money deposit failed for " + player.getName() + ": " + response.errorMessage);
+        if (!plugin.getEconomyService().deposit(player, amount)) {
             MessageUtil.send(plugin, player, "economy.deposit-failed");
             return;
         }
         if (plugin.getConfig().getBoolean("economy.deposit.notify-player", true)) {
             String lootName = table == null ? "loot" : (table.getDisplayName() == null ? table.getId() : table.getDisplayName());
-            MessageUtil.send(plugin, player, "economy.received", Map.of("money", String.format("%.2f", response.amount), "loot-name", lootName));
+            MessageUtil.send(plugin, player, "economy.received", Map.of("money", plugin.getEconomyService().format(amount), "loot-name", lootName));
         }
     }
     private String placeholders(String command, Player player, LootTable table) { String value = command.startsWith("/") ? command.substring(1) : command; Map<String, String> values = new HashMap<>(); values.put("player", player.getName()); values.put("player_name", player.getName()); values.put("player_uuid", player.getUniqueId().toString()); values.put("world", player.getWorld().getName()); values.put("x", String.valueOf(player.getLocation().getBlockX())); values.put("y", String.valueOf(player.getLocation().getBlockY())); values.put("z", String.valueOf(player.getLocation().getBlockZ())); values.put("loot_table", table == null ? "" : table.getId()); for (Map.Entry<String, String> entry : values.entrySet()) value = value.replace("%" + entry.getKey() + "%", entry.getValue()); return TextUtil.color(value); }

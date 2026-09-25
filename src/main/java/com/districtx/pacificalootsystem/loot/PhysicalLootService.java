@@ -108,6 +108,7 @@ public final class PhysicalLootService implements Listener, LootContainerService
                 linkedSessions.remove(linkedId, player.getUniqueId());
                 return false;
             }
+            linkedLoot.setXpRewardClaimed(false);
             plugin.getApi().getEventService().call(new LootGeneratedEvent(player, table, result));
             List<ItemStack> containerItems = prepareItemsForContainer(player, result, linkedLoot);
             Map<Integer, ItemStack> generatedContents = randomizedContents(containerItems);
@@ -127,7 +128,15 @@ public final class PhysicalLootService implements Listener, LootContainerService
         PhysicalLootGUI gui = new PhysicalLootGUI(plugin, this, session, title(table));
         openGuis.put(player.getUniqueId(), gui);
         player.openInventory(gui.getInventory());
+        if (player.getOpenInventory().getTopInventory().getHolder() != gui) {
+            saveAndRemove(player, gui);
+            return true;
+        }
         openContainer(linkedLoot, player);
+        if (generated) {
+            int baseXp = plugin.getApi().getXpService().calculateBaseXp(table);
+            if (baseXp > 0) plugin.getApi().getXpService().awardXp(player, linkedLoot, baseXp);
+        }
         return true;
     }
 

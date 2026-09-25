@@ -13,6 +13,7 @@ public class LootResult {
     private final List<ItemStack> items = new ArrayList<>();
     private final List<Boolean> itemAutoPickup = new ArrayList<>();
     private final List<String> commands = new ArrayList<>();
+    private final List<LootMoneyRewardPayout> moneyRewards = new ArrayList<>();
     private double money;
     private int experience;
     private int levels;
@@ -22,6 +23,11 @@ public class LootResult {
     public void addItem(ItemStack item, boolean autoPickup) {
         items.add(item);
         itemAutoPickup.add(autoPickup);
+    }
+
+    public void addMoneyReward(LootMoneyReward reward, double amount) {
+        moneyRewards.add(new LootMoneyRewardPayout(reward, amount));
+        money += amount;
     }
 
     public boolean isAutoPickup(int index) {

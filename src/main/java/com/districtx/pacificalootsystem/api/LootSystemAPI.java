@@ -31,6 +31,8 @@ public final class LootSystemAPI implements PacificaLootAPI {
     @Override public LootContainerService getLootContainerService() { return plugin.getPhysicalLootService(); }
     @Override public LootHologramService getLootHologramService() { return plugin.getHologramManager(); }
     @Override public LootEventService getEventService() { return eventService; }
+    @Override public LootXpService getXpService() { return plugin.getXpService(); }
+    @Override public LootRankBonusService getRankBonusService() { return plugin.getRankBonusService(); }
     public void registerCondition(LootCondition condition) { ConditionRegistry.register(condition); }
     public void registerRewardType(LootRewardType rewardType) { RewardRegistry.register(rewardType); }
     public void registerTrigger(LootTrigger trigger) { TriggerRegistry.register(trigger); }

@@ -5,10 +5,10 @@ api-version: '1.21'
 author: DistrictX Developers Official
 description: Advanced persistent loot tables, linked physical containers, loot bags, holograms, and economy rewards.
 website: https://github.com/hxmezu-a/Pacifica-LootSystem
-depend:
-  - Vault
 softdepend:
+  - Vault
   - Essentials
+  - LuckPerms
 commands:
   loot:
     description: Pacifica-LootSystem administration command.

@@ -19,6 +19,7 @@ public final class LinkedLoot {
     private int z;
     private String blockType;
     private long cooldownEndsAt;
+    private boolean xpRewardClaimed;
     private long createdAt;
     private long updatedAt;
 

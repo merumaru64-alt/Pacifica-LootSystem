@@ -49,6 +49,8 @@ public final class YamlStorage {
             table.setSelectionMode(t.getString("selection-mode", "RANDOM"));
             table.setMinimumRewards(Math.max(0, t.getInt("minimum-rewards", 1)));
             table.setMaximumRewards(Math.max(table.getMinimumRewards(), t.getInt("maximum-rewards", 1)));
+            table.setMinimumXpReward(Math.max(0, t.getInt("xp-reward.minimum", 0)));
+            table.setMaximumXpReward(Math.max(table.getMinimumXpReward(), t.getInt("xp-reward.maximum", table.getMinimumXpReward())));
             table.setCooldownSeconds(Math.max(0, t.getLong("cooldown-seconds", 0)));
             table.setGlobalMode(t.getBoolean("global-mode", false));
             table.setLootMode("PHYSICAL");
@@ -175,6 +177,8 @@ public final class YamlStorage {
             config.set(p + ".selection-mode", table.getSelectionMode());
             config.set(p + ".minimum-rewards", table.getMinimumRewards());
             config.set(p + ".maximum-rewards", table.getMaximumRewards());
+            config.set(p + ".xp-reward.minimum", table.getMinimumXpReward());
+            config.set(p + ".xp-reward.maximum", table.getMaximumXpReward());
             config.set(p + ".cooldown-seconds", table.getCooldownSeconds());
             config.set(p + ".global-mode", table.isGlobalMode());
             config.set(p + ".loot-mode", "PHYSICAL");

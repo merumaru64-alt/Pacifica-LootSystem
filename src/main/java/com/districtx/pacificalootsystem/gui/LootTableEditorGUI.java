@@ -34,6 +34,7 @@ public final class LootTableEditorGUI extends BaseGUI {
             inventory.setItem(i - from, icon(collectable));
         }
         inventory.setItem(45, ItemUtil.icon("ARROW", "&ePrevious", List.of("&7Page " + (page + 1))));
+        inventory.setItem(48, ItemUtil.icon("EXPERIENCE_BOTTLE", "&aXP Reward", List.of("&7Minimum: " + table.getMinimumXpReward(), "&7Maximum: " + table.getMaximumXpReward(), "&7Click to edit")));
         inventory.setItem(49, ItemUtil.icon("COMPARATOR", "&bSettings", List.of("&7Mode: " + table.getSelectionMode(), "&7Rewards: " + table.getMinimumRewards() + "-" + table.getMaximumRewards())));
         inventory.setItem(50, ItemUtil.icon("EMERALD", "&aSave", List.of("&7Persist this loot table")));
         inventory.setItem(53, ItemUtil.icon("BARRIER", "&cClose", List.of()));
@@ -66,6 +67,24 @@ public final class LootTableEditorGUI extends BaseGUI {
         }
         if (slot == 49) {
             new SettingsGUI(plugin, table).open(player);
+            return;
+        }
+        if (slot == 48) {
+            plugin.requestInput(player, "Enter XP reward bounds such as 25-100", value -> {
+                try {
+                    String[] parts = value.split("-", -1);
+                    if (parts.length > 2) throw new NumberFormatException();
+                    int minimum = Integer.parseInt(parts[0]);
+                    int maximum = parts.length > 1 ? Integer.parseInt(parts[1]) : minimum;
+                    if (minimum < 0 || maximum < minimum) throw new NumberFormatException();
+                    table.setMinimumXpReward(minimum);
+                    table.setMaximumXpReward(maximum);
+                    render();
+                    player.openInventory(inventory);
+                } catch (NumberFormatException exception) {
+                    player.sendMessage("§cUse non-negative XP bounds such as 25-100.");
+                }
+            });
             return;
         }
         if (slot == 50) {

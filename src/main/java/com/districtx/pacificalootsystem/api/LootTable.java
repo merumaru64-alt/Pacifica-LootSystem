@@ -22,6 +22,8 @@ public class LootTable {
     private String selectionMode = "RANDOM";
     private int minimumRewards = 1;
     private int maximumRewards = 1;
+    private int minimumXpReward;
+    private int maximumXpReward;
     private long cooldownSeconds;
     private boolean globalMode;
     private String lootMode = "PHYSICAL";

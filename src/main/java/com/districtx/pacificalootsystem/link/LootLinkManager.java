@@ -84,6 +84,7 @@ public final class LootLinkManager implements LinkedLootService {
             config.set(path + ".z", link.getZ());
             config.set(path + ".block-type", link.getBlockType());
             config.set(path + ".cooldown-ends-at", link.getCooldownEndsAt());
+            config.set(path + ".xp-reward-claimed", link.isXpRewardClaimed());
             config.set(path + ".created-at", link.getCreatedAt());
             config.set(path + ".updated-at", link.getUpdatedAt());
             containerRepository.saveLinkedLoot(link);
@@ -320,9 +321,11 @@ public final class LootLinkManager implements LinkedLootService {
             UUID id = UUID.fromString(rawId);
             UUID tableId = UUID.fromString(section.getString("loot-table-id", ""));
             UUID worldId = UUID.fromString(section.getString("world-id", ""));
-            return new LinkedLoot(id, tableId, worldId, section.getInt("x"), section.getInt("y"), section.getInt("z"),
+            LinkedLoot link = new LinkedLoot(id, tableId, worldId, section.getInt("x"), section.getInt("y"), section.getInt("z"),
                 section.getString("block-type", "UNKNOWN"), section.getLong("cooldown-ends-at", 0),
                 section.getLong("created-at", 0), section.getLong("updated-at", section.getLong("created-at", 0)));
+            link.setXpRewardClaimed(section.getBoolean("xp-reward-claimed", false));
+            return link;
         } catch (IllegalArgumentException ignored) {
             return null;
         }

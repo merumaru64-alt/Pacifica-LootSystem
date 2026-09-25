@@ -57,3 +57,12 @@ mobs: {}
 sounds:
   loot-success: ENTITY_PLAYER_LEVELUP
   loot-fail: ENTITY_VILLAGER_NO
+xp-rewards:
+  enabled: true
+  message: "&e&l+ &a&l%xp%"
+  sound:
+    enabled: true
+    name: ENTITY_EXPERIENCE_ORB_PICKUP
+  rank-bonuses:
+    vip: 0.07
+    godfather: 0.05

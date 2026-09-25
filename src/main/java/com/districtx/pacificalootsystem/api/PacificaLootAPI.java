@@ -18,4 +18,10 @@ public interface PacificaLootAPI {
     LootEventService getEventService();
     /** Returns the configured economy service. */
     EconomyService getEconomyService();
+    /** Returns the XP reward and calculation service. */
+    LootXpService getXpService();
+    /** Returns the optional LuckPerms-backed primary-rank XP bonus service. */
+    LootRankBonusService getRankBonusService();
+    /** Returns the Vault-independent economy integration contract. */
+    default LootEconomyService getLootEconomyService() { return getEconomyService(); }
 }
